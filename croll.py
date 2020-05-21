@@ -10,9 +10,9 @@ r1 = requests.get(url1)
 # BeatifulSoup 객체 생성
 soup = BeautifulSoup(r1.content, "html.parser", from_encoding='utf-8')
 
-print(soup)
-
 h2 = soup.select('h2')
+print(h2[0].text)
+
 
 class Crolling:
     def __init__(self, url):

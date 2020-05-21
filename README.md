@@ -14,3 +14,7 @@ KoNLPy
 - 데이터 시각화
 numpy
 matplotlib
+
+
+contact
+faller825@khu.ac.kr

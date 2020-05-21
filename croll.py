@@ -11,7 +11,7 @@ r1 = requests.get(url1)
 soup = BeautifulSoup(r1.content, "html.parser", from_encoding='utf-8')
 
 h2 = soup.select('h2')
-print(h2[0].text)
+print(h2[0].text) # h2의 글자만 추출한 것
 
 
 class Crolling:

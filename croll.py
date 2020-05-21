@@ -27,4 +27,10 @@ class Crolling:
             title.append(k[i])
         return title
 
+    def make_sentence(self, sen):
+        sentence = ''
+        for i in range(len(sen)):
+            sentence.join(sen[i])
+        return sentence
+
 

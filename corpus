@@ -26,3 +26,5 @@ for subtree in chunks.subtrees():
         print(' '.join((e[0] for e in list(subtree))))
         print(subtree.pprint())
 
+
+chunks.draw()

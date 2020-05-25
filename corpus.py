@@ -4,26 +4,43 @@ import nltk
 # 크롤링한 데이터 받아오는 부분
 import croll
 
-# pos tag를 달기
-sentence = str(croll.h2[0])
-words = konlpy.tag.Twitter().pos(sentence)
+# Reference = https://github.com/neotune/python-korean-handler
+class KorToPix:
+    def __init__(self, crowling):
+        self.crowing = crowling
 
-# 형태소 정의, NP : 명사, VP : 동사, AP : 조사
-grammar = """
-NP: {<N.*>*<Suffix>?}   
-VP: {<V.*>*}            
-AP: {<A.*>*}            
-"""
+    def wordappart(self, korean_word):
+        """
+        한글 단어를 입력받아서 초성/중성/종성을 구분해주는 함수
+        """
+        # 초성 리스트. 00 ~ 18
+        CHOSUNG_LIST = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
+        # 중성 리스트. 00 ~ 20
+        JUNGSUNG_LIST = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ',
+                         'ㅢ', 'ㅣ']
+        # 종성 리스트. 00 ~ 27 + 1(1개 없음)
+        JONGSUNG_LIST = [' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',
+                         'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 
-parser = nltk.RegexpParser(grammar)
-chunks = parser.parse(words)
+        r_lst = []
+        for w in list(korean_word.strip()):
+            if '가' <= w <= '힣':
+                ch1 = (ord(w) - ord('가')) // 588
+                ch2 = ((ord(w) - ord('가')) - (588 * ch1)) // 28
+                ch3 = (ord(w) - ord('가')) - (588 * ch1) - 28 * ch2
+                r_lst.append([CHOSUNG_LIST[ch1], JUNGSUNG_LIST[ch2], JONGSUNG_LIST[ch3]])
+            else:
+                r_lst.append([w])
+        return r_lst
 
-print(chunks.pprint())
+    def tocolor(self, word):
+        """
+        단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주는 함수
+        :param word:
+        :return:
+        """
+        w = word[0]
+        for i in range(len(w)):
+            if w[i] == self.CHOSUNG
 
-# subtree 표시하는 부분
-print("\n print none")
-for subtree in chunks.subtrees():
-    if subtree.label() == 'NP':
-        print(' '.join((e[0] for e in list(subtree))))
-        print(subtree.pprint())
 

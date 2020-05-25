@@ -4,6 +4,9 @@
 웹 크롤러를 사용하여 해당 홈페이지 및 아티클 등을 읽어오고, 이를 분석해 어투에 따른 색을 부여합니다. 
 
 [example screen shot]
+```sh
+Reference = https://github.com/neotune/python-korean-handler
+```
 
 ## 사용 예시
 웹 서비스 url을 입력하면 사용할 수 있습니다.
@@ -13,7 +16,6 @@
 - 웹 크롤링
 [requests](https://requests.readthedocs.io/en/master/) , 
 [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-
 - 데이터 시각화
 [numpy](https://numpy.org/), 
 [matplotlib](https://matplotlib.org/)

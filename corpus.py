@@ -36,8 +36,6 @@ class KorToPix:
     def tocolor(self, word):
         """
         단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주는 함수
-        :param word:
-        :return:
         """
         w = word[0]
         color = hex(w)

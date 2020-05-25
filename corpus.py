@@ -40,7 +40,7 @@ class KorToPix:
         :return:
         """
         w = word[0]
-        for i in range(len(w)):
-            if w[i] == self.CHOSUNG
-
+        color = hex(w)
+        color = "#" + str(color)
+        return color
 

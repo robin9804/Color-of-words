@@ -1,5 +1,6 @@
 import konlpy
 import nltk
+import numpy as np
 
 # 크롤링한 데이터 받아오는 부분
 import croll
@@ -42,3 +43,12 @@ class KorToPix:
         color = "#" + str(color)
         return color
 
+    def coordinate(self, color, x, y):
+        """
+        색이 지정된 것을 정렬하여 내놓는 함수
+        """
+        w = color.sort()
+        canvas = np.zeros([x,y]) # Grid size define
+        for x ,y in zip(canvas):
+            canvas[x,y] = w[x+y]
+        return canvas

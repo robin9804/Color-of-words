@@ -43,6 +43,34 @@ class KorToPix:
         color = "#" + str(color)
         return color
 
+    def hsvTohex(hsv):
+        """
+        HSV 좌표로 표현된 색을 16비트 rgb 색으로 표현
+        """
+        h = hsv[0]  # Hue 는 360까지 범위를 가짐
+        s = hsv[1]  # 채도는 0 to 100
+        v = hsv[2]  # 명도는 0 to 100 의 범위를 가짐
+
+        s = s / 100
+        v = v / 100
+
+        C = v * s
+        X = C * (1 - abs((h / 60) % 2 - 1))
+        m = v - C
+        if 0 <= h < 60:
+            r, g, b = C, X, 0
+        elif 60 <= h < 120:
+            r, g, b = X, C, 0
+        elif 120 <= h < 180:
+            r, g, b = 0, C, X
+        elif 180 <= h < 240:
+            r, g, b = 0, X, C
+        elif 240 <= h < 300:
+            r, g, b = X, 0, C
+        elif 300 <= h < 360:
+            r, g, b = C, 0, X
+        return round((r + m) * 255), round((g + m) * 255), round((b + m) * 255)
+
     def coordinate(self, color, x, y):
         """
         색이 지정된 것을 정렬하여 내놓는 함수

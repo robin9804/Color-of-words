@@ -34,14 +34,32 @@ class KorToPix:
                 r_lst.append([w])
         return r_lst
 
-    def tocolor(self, word):
+    def choseColor(self, word):
+        first = word[0][0]
+        second = word[0][1]
+        third = word[0][2]
+        H = 0  # 0 ~ 360
+        S = 0  # 0 ~ 100
+        V = 0  # 0 ~ 100
+
+        return H, S, V
+
+    def tocolor(self, sen):
         """
         단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주기
         """
-        w = word[0]
-        color = hex(w)
-        color = "#" + str(color)
-        return color
+        importance = np.unique(np.array(sen), return_counts=True)
+        words = t.findall(sen)
+        colorbag = []
+        for i in len(words):
+            if words[i] < '가' or words[i] > '힣':
+                colorbag.append([0, 0, 0])  # 한글이 아닌경우 black
+            else:
+                word = self.wordappart(words[i])
+                # chose color에 채도 등이 들어가려면 np.unique가 사용되어야 할듯
+                colorbag.append(self.choseColor(word))
+
+        return colorbag
 
     def hsvTohex(hsv):
         """

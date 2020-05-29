@@ -87,10 +87,22 @@ class KorToPix:
             h = 0
         return h
 
-    def weightHue(self):
+    def weightHue(self, word):
         """
-        HUE에 가중치를 부여하는 함수
+        HUE에 가중치를 부여하는 함수 받침으로 결정한다.
         """
+        third = word[0][2]
+        weight = 0
+
+
+        return weight
+
+    def selectSaturation(self, word):
+        second = word[0][1]
+        s = 0
+
+        return s
+
 
     def tocolor(self):
         """
@@ -98,15 +110,14 @@ class KorToPix:
         """
         # 중요도 추출(아스키코드 순서대로 반환해준다)
         words, importance = np.unique(np.array(self.words), return_counts=True)
-
+        softmax = np.sum(np.exp(importance))
         colorbag = []
         for i in len(words):
-            h = self.selectHue(words[i])
-            s = 0
-            if importance[i]
-            v = 0
+            h = self.selectHue(words[i]) + self.weightHue(words[i])
+            s = self.selectSaturation(words[i])
+            v = np.exp(importance[i])/softmax
 
-            colorbag.append([h, s, v])
+            colorbag.append([h, s, round(v)])
 
         return colorbag
 

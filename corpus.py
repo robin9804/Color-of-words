@@ -93,15 +93,28 @@ class KorToPix:
         """
         third = word[0][2]
         weight = 0
-
-
-        return weight
+        JONGSUNG_LIST = [' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',
+                         'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
+        for i in range(len(JONGSUNG_LIST)):
+            if third == JONGSUNG_LIST[i]:
+                weight = (i/28) * 20
+        return round(weight)
 
     def selectSaturation(self, word):
+        """
+        모음을 통해 saturation을 정해주는 함수.
+        """
+        JUNGSUNG_LIST = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ',
+                         'ㅢ', 'ㅣ']
         second = word[0][1]
+        third = word[0][2]
         s = 0
-
-        return s
+        for i in range(len(JUNGSUNG_LIST)):
+            if second == JUNGSUNG_LIST[i]:
+                s = i * 5
+                if third != ' ':
+                    s = s + np.cos(self.weightHue(word)*20)*5
+        return round(abs(s))
 
 
     def tocolor(self):

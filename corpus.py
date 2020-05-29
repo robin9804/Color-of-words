@@ -1,14 +1,15 @@
-import konlpy
-import nltk
 import numpy as np
+import re
 
 # 크롤링한 데이터 받아오는 부분
-import croll
 
 # Reference = https://github.com/neotune/python-korean-handler
 class KorToPix:
-    def __init__(self, crowling):
-        self.crowing = crowling
+    def __init__(self, sentence):
+        self.sentence = sentence
+        # 문자를 한 글자씩 분리하기
+        t = re.compile("[\w]")
+        self.words = t.findall(self.sentence)
 
     def wordappart(self, korean_word):
         """
@@ -34,30 +35,78 @@ class KorToPix:
                 r_lst.append([w])
         return r_lst
 
-    def choseColor(self, word):
+    def selectHue(self, word):
+        """
+        초성에 대해서 색상을 배정해주는 함수
+        """
         first = word[0][0]
         second = word[0][1]
         third = word[0][2]
-        H = 0  # 0 ~ 360
-        S = 0  # 0 ~ 100
-        V = 0  # 0 ~ 100
+        h = 0  # 0 ~ 360
 
-        return H, S, V
+        # 초성에 대해서 색상의 분포를 정해주기
+        if first == 'ㅆ':  # ㅆ은 0 ~ 14
+            h = 0
+        elif first == 'ㄲ':  # ㄲ은 14 ~ 28
+            h = 14
+        elif first == 'ㄱ':  # ㄱ은 28 ~ 50
+            h = 28
+        elif first == 'ㄴ':  # ㄴ은 50 ~ 70
+            h = 50
+        elif first == 'ㄹ':  # ㄹ은 70 ~ 90
+            h = 70
+        elif first == 'ㅁ':  # ㅁ은 90 ~ 110
+            h = 90
+        elif first == 'ㅂ':  # ㅂ은 110 ~ 130
+            h = 110
+        elif first == 'ㄷ':  # ㄷ은 130 ~ 150
+            h = 130
+        elif first == 'ㅇ':  # ㅇ은 150 ~ 170
+            h = 150
+        elif first == 'ㅎ':  # ㅎ은 170 ~ 190
+            h = 170
+        elif first == 'ㅅ':  # ㅅ은 190 ~ 210
+            h = 190
+        elif first == 'ㅈ':  # ㅈ은 210 ~ 230
+            h = 210
+        elif first == 'ㅊ':  # ㅊ은 210 ~ 230
+            h = 230
+        elif first == 'ㅌ':  # ㅌ은 230 ~ 250
+            h = 250
+        elif first == 'ㅋ':  # ㅋ은 250 ~ 270
+            h = 270
+        elif first == 'ㅍ':  # ㅍ은 270 ~ 290
+            h = 290
+        elif first == 'ㄸ':  # 은 310 ~ 327
+            h = 310
+        elif first == 'ㅃ':  # ㄲ은 10 ~ 20
+            h = 327
+        elif first == 'ㅉ':  # ㄲ은 10 ~ 20
+            h = 342
+        else:
+            h = 0
+        return h
 
-    def tocolor(self, sen):
+    def weightHue(self):
+        """
+        HUE에 가중치를 부여하는 함수
+        """
+
+    def tocolor(self):
         """
         단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주기
         """
-        importance = np.unique(np.array(sen), return_counts=True)
-        words = t.findall(sen)
+        # 중요도 추출(아스키코드 순서대로 반환해준다)
+        words, importance = np.unique(np.array(self.words), return_counts=True)
+
         colorbag = []
         for i in len(words):
-            if words[i] < '가' or words[i] > '힣':
-                colorbag.append([0, 0, 0])  # 한글이 아닌경우 black
-            else:
-                word = self.wordappart(words[i])
-                # chose color에 채도 등이 들어가려면 np.unique가 사용되어야 할듯
-                colorbag.append(self.choseColor(word))
+            h = self.selectHue(words[i])
+            s = 0
+            if importance[i]
+            v = 0
+
+            colorbag.append([h, s, v])
 
         return colorbag
 

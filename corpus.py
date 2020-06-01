@@ -95,8 +95,12 @@ class KorToPix:
         weight = 0
         JONGSUNG_LIST = [' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',
                          'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
+        # 자음에 가중치를 부여하는 순서
+        jaum_weight = [' ','ㅍ', 'ㅋ', 'ㅌ', 'ㅊ', 'ㅂ', 'ㅎ', 'ㅅ','ㅈ', 'ㄷ', 'ㅁ', 'ㄹ', 'ㄱ', 'ㄴ']
         for i in range(len(JONGSUNG_LIST)):
             if third == JONGSUNG_LIST[i]:
+                # for j in range(len(jaum_weight)):
+                
                 weight = (i/28) * 20
         return round(weight)
 
@@ -125,10 +129,13 @@ class KorToPix:
         words, importance = np.unique(np.array(self.words), return_counts=True)
         softmax = np.sum(np.exp(importance))
         colorbag = []
-        for i in len(words):
-            h = self.selectHue(words[i]) + self.weightHue(words[i])
-            s = self.selectSaturation(words[i])
-            v = np.exp(importance[i])/softmax
+        for i in len(self.words):
+            h = self.selectHue(self.words[i]) + self.weightHue(self.words[i])
+            s = self.selectSaturation(self.words[i])
+            for j in range(len(words)):
+                if self.words[i] == words[j]:
+                    # 명도의 가중치 부여
+                    v = np.exp(importance[j])/softmax * 100
 
             colorbag.append([h, s, round(v)])
 

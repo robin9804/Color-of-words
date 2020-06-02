@@ -1,13 +1,10 @@
-import numpy as np
 import matplotlib.pyplot as plt
-import re
-
 from corpus import KorToPix as KP
 
 # main 함수입니다.
 
 # 예제 글꼭지 : 별 헤는 밤
-poem = '''
+po = '''
 계절이 지나가는 하늘에는
 가을로 가득 차 있습니다.
 
@@ -49,28 +46,31 @@ poem = '''
 자랑처럼 풀이 무성할 거외다.
 '''
 
-# 인스턴스 불러오기
-kor = KP(poem)
+def Picture(poem, mode=1):
+    # 인스턴스 불러오기
+    Poem = KP(poem)
 
-# 자소로 나눠진 글을 출력해보기
-print(kor.words)
+    # 자소로 나눠진 글을 출력해보기
+    print(Poem.words)
 
-# HSV 좌표로 바꿔진 글
-colorbag = kor.tocolor()
+    # HSV 좌표로 바꿔진 글
+    colorbag = Poem.tocolor()
 
-'''
-x = 5  # 높이
-y = 4  # 너비
-canvas = np.random.random((x, y, 3))
-canvas[0][1] = [0, 0, 0]  # [높이][너비]
-print(canvas)
-'''
-print(colorbag)
-print(len(kor.words))
-print(len(colorbag))
+    # 그림으로 만들기
+    canvas1 = Poem.makePicture(colorbag)
 
-canvas = kor.coordinate(colorbag)
+    # 색상별로 분류하기
+    canvas2 = Poem.sortPicture(colorbag)
 
-plt.figure()
-plt.imshow(canvas)
-plt.show()
+    # 그림 보기
+    if mode == 1:
+        plt.figure()
+        plt.imshow(canvas1)
+        plt.show()
+    elif mode == 2:  # 정렬된 모드
+        plt.figure()
+        plt.imshow(canvas2)
+        plt.show()
+
+if __name__ == '__main__':
+    Picture(po, 1)

@@ -38,7 +38,7 @@ class KorToPix:
                 ch3 = (ord(w) - ord('가')) - (588 * ch1) - 28 * ch2
                 r_lst.append([CHOSUNG_LIST[ch1], JUNGSUNG_LIST[ch2], JONGSUNG_LIST[ch3]])
             else:
-                r_lst.append([w])
+                r_lst.append([w, 0, 0])
         return r_lst
 
     def importance(self):
@@ -120,7 +120,6 @@ class KorToPix:
         jaum_weight = [' ','ㅍ', 'ㅋ', 'ㅌ', 'ㅊ', 'ㅂ', 'ㅎ', 'ㅅ','ㅈ', 'ㄷ', 'ㅁ', 'ㄹ', 'ㄱ', 'ㄴ']
         for i in range(len(JONGSUNG_LIST)):
             if third == JONGSUNG_LIST[i]:
-                # for j in range(len(jaum_weight)):
                 weight = ((i+1)/28) * 20
         return round(weight)
 
@@ -140,7 +139,7 @@ class KorToPix:
                     s = s + 2
         return s
 
-    def setValue(self, sen):
+    def selectValue(self, sen):
         word = self.wordappart(sen)
         first = str(word[0][0])  # 초성
         second = str(word[0][1])  # 중성
@@ -162,40 +161,58 @@ class KorToPix:
         단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주기
         """
         # 중요도 추출(아스키코드 순서대로 반환해준다)
-        word, importance = np.unique(np.array(self.words), return_counts=True)
         self.importance()
         colorbag = []
 
         for i in range(len(self.words)):
             h = self.selectHue(self.words[i]) + self.weightHue(self.words[i])
             s = self.selectSaturation(self.words[i])
-            v = self.setValue(self.words[i])
-            print(self.words[i])
-            colorbag.append(list(colorsys.hsv_to_rgb(h/360, s/100, int(v)/100)))
+            v = self.selectValue(self.words[i])
+            # colorbag.append(list(colorsys.hsv_to_rgb(h/360, s/100, int(v)/100)))
+            colorbag.append([h/360, s/100, v/100])
         return colorbag
 
-    def coordinate(self, color):
+    def makePicture(self, color):
         """
         색이 지정된 것을 바로 내놓는 함수
         """
-
         x = int(round(np.sqrt(len(self.words) + 1)))  # 높이
         y = x  # 너비
         canvas = np.zeros((x, y, 3))
-        # color = np.array(color) / 255
+        color = np.array(color)
+        # HSV 좌표에서 RGB로 바꾸는 부분
+        for i in range(len(self.words)):
+            h = color[i][0]
+            s = color[i][1]
+            v = color[i][2]
+            color[i] = colorsys.hsv_to_rgb(h, s, v)
         try:
             for i in range(x):
                 for j in range(y):
                     canvas[i][j] = color[i*x + j]
         except IndexError:
             pass
-        # canvas = color.reshape(x, y)  # Grid size define
         return canvas
 
-    def sortCoordinate(self, color):
+    def sortPicture(self, color):
         """
-        정렬해서 쓰는 함수
+        색상에 따라 정렬해서 쓰는 함수
         """
-        x = np.sqrt(len(self.words) + 1)
-        y = x
-        w = np.sort(np.array(color))
+        x = int(round(np.sqrt(len(self.words) + 1)))  # 높이
+        y = x  # 너비
+        canvas = np.zeros((x, y, 3))
+        color.sort()
+        color = np.array(color)
+        # HSV 좌표에서 RGB로 바꾸는 부분
+        for i in range(len(self.words)):
+            h = color[i][0]
+            s = color[i][1]
+            v = color[i][2]
+            color[i] = colorsys.hsv_to_rgb(h, s, v)
+        try:
+            for i in range(x):
+                for j in range(y):
+                    canvas[i][j] = color[i*x + j]
+        except IndexError:
+            pass
+        return canvas

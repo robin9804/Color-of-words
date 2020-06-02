@@ -1,4 +1,5 @@
 import numpy as np
+import colorsys
 import re
 
 # 크롤링한 데이터 받아오는 부분
@@ -10,6 +11,10 @@ class KorToPix:
         # 문자를 한 글자씩 분리하기
         t = re.compile("[\w]")
         self.words = t.findall(self.sentence)
+        self.w1 = []  # 사용된 초성
+        self.i1 = []  # 초성에 사용된 모음의 횟수
+        self.w2 = []  # 사용된 모음
+        self.i2 = []  # 모음당 사용된 횟수
 
     def wordappart(self, korean_word):
         """
@@ -25,6 +30,7 @@ class KorToPix:
                          'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 
         r_lst = []
+        korean_word = str(korean_word[0])
         for w in list(korean_word.strip()):
             if '가' <= w <= '힣':
                 ch1 = (ord(w) - ord('가')) // 588
@@ -35,13 +41,27 @@ class KorToPix:
                 r_lst.append([w])
         return r_lst
 
-    def selectHue(self, word):
+    def importance(self):
+        """
+        사용된 자소에 따른 사용 빈도를 구해주는 함수
+        """
+        first = []
+        second = []
+        for i in range(len(self.words)):
+            w = self.wordappart(self.words[i])
+            second.append(w[0][1])  # 중성 (모음)
+            first.append(w[0][0])  # 초성
+        self.w1, self.i1 = np.unique(np.array(first), return_counts=True)
+        self.w2, self.i2 = np.unique(np.array(second), return_counts=True)
+
+    def selectHue(self, sen):
         """
         초성에 대해서 색상을 배정해주는 함수
         """
+        word = self.wordappart(sen)
         first = word[0][0]
-        second = word[0][1]
-        third = word[0][2]
+        # second = word[0][1]
+        # third = word[0][2]
         h = 0  # 0 ~ 360
 
         # 초성에 대해서 색상의 분포를 정해주기
@@ -87,10 +107,11 @@ class KorToPix:
             h = 0
         return h
 
-    def weightHue(self, word):
+    def weightHue(self, sen):
         """
         HUE에 가중치를 부여하는 함수 받침으로 결정한다.
         """
+        word = self.wordappart(sen)
         third = word[0][2]
         weight = 0
         JONGSUNG_LIST = [' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',
@@ -100,81 +121,81 @@ class KorToPix:
         for i in range(len(JONGSUNG_LIST)):
             if third == JONGSUNG_LIST[i]:
                 # for j in range(len(jaum_weight)):
-                
-                weight = (i/28) * 20
+                weight = ((i+1)/28) * 20
         return round(weight)
 
-    def selectSaturation(self, word):
+    def selectSaturation(self, sen):
         """
         모음을 통해 saturation을 정해주는 함수.
         """
-        JUNGSUNG_LIST = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ',
-                         'ㅢ', 'ㅣ']
-        second = word[0][1]
-        third = word[0][2]
+        word = self.wordappart(sen)
+        Last = ['ㅐ', 'ㅏ', 'ㅘ', 'ㅙ', 'ㅑ', 'ㅗ','ㅛ' ,'ㅓ','ㅕ', 'ㅔ', 'ㅚ', 'ㅝ', 'ㅞ','ㅒ', 'ㅖ', 'ㅣ', 'ㅡ', 'ㅜ', 'ㅠ', 'ㅟ', 'ㅢ']
+        second = str(word[0][1])
+        third = str(word[0][2])
         s = 0
-        for i in range(len(JUNGSUNG_LIST)):
-            if second == JUNGSUNG_LIST[i]:
+        for i in range(21):
+            if second == Last[i]:
                 s = i * 5
-                if third != ' ':
-                    s = s + np.cos(self.weightHue(word)*20)*5
-        return round(abs(s))
+                if third == ' ':
+                    s = s + 2
+        return s
 
+    def setValue(self, sen):
+        word = self.wordappart(sen)
+        first = str(word[0][0])  # 초성
+        second = str(word[0][1])  # 중성
+        v = 80
+        i1 = self.i1 / np.max(self.i1)
+        i2 = self.i2 / np.max(self.i2)
+        for i in range(len(i1)):
+            if first == self.w1[i]:
+                v = v + i1[i] * 20
+        for j in range(len(i2)):
+            if second == self.w2[j]:
+                v = v + i2[j] * 10
+        if v > 100:
+            v = 100
+        return round(v)
 
     def tocolor(self):
         """
         단어를 넣었을 때 초성, 중성, 종성에 따라 색을 지정해주기
         """
         # 중요도 추출(아스키코드 순서대로 반환해준다)
-        words, importance = np.unique(np.array(self.words), return_counts=True)
-        softmax = np.sum(np.exp(importance))
+        word, importance = np.unique(np.array(self.words), return_counts=True)
+        self.importance()
         colorbag = []
-        for i in len(self.words):
+
+        for i in range(len(self.words)):
             h = self.selectHue(self.words[i]) + self.weightHue(self.words[i])
             s = self.selectSaturation(self.words[i])
-            for j in range(len(words)):
-                if self.words[i] == words[j]:
-                    # 명도의 가중치 부여
-                    v = np.exp(importance[j])/softmax * 100
-
-            colorbag.append([h, s, round(v)])
-
+            v = self.setValue(self.words[i])
+            print(self.words[i])
+            colorbag.append(list(colorsys.hsv_to_rgb(h/360, s/100, int(v)/100)))
         return colorbag
 
-    def hsvTohex(hsv):
+    def coordinate(self, color):
         """
-        HSV 좌표로 표현된 색을 16비트 rgb 색으로 표현
+        색이 지정된 것을 바로 내놓는 함수
         """
-        h = hsv[0]  # Hue 는 360까지 범위를 가짐
-        s = hsv[1]  # 채도는 0 to 100
-        v = hsv[2]  # 명도는 0 to 100 의 범위를 가짐
 
-        s = s / 100
-        v = v / 100
-
-        C = v * s
-        X = C * (1 - abs((h / 60) % 2 - 1))
-        m = v - C
-        if 0 <= h < 60:
-            r, g, b = C, X, 0
-        elif 60 <= h < 120:
-            r, g, b = X, C, 0
-        elif 120 <= h < 180:
-            r, g, b = 0, C, X
-        elif 180 <= h < 240:
-            r, g, b = 0, X, C
-        elif 240 <= h < 300:
-            r, g, b = X, 0, C
-        elif 300 <= h < 360:
-            r, g, b = C, 0, X
-        return round((r + m) * 255), round((g + m) * 255), round((b + m) * 255)
-
-    def coordinate(self, color, x, y):
-        """
-        색이 지정된 것을 정렬하여 내놓는 함수
-        """
-        w = color.sort()
-        canvas = np.zeros([x,y]) # Grid size define
-        for x ,y in zip(canvas):
-            canvas[x,y] = w[x+y]
+        x = int(round(np.sqrt(len(self.words) + 1)))  # 높이
+        y = x  # 너비
+        canvas = np.zeros((x, y, 3))
+        # color = np.array(color) / 255
+        try:
+            for i in range(x):
+                for j in range(y):
+                    canvas[i][j] = color[i*x + j]
+        except IndexError:
+            pass
+        # canvas = color.reshape(x, y)  # Grid size define
         return canvas
+
+    def sortCoordinate(self, color):
+        """
+        정렬해서 쓰는 함수
+        """
+        x = np.sqrt(len(self.words) + 1)
+        y = x
+        w = np.sort(np.array(color))

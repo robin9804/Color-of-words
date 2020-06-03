@@ -3,7 +3,11 @@
 
 웹 크롤러를 사용하여 해당 홈페이지 및 아티클 등을 읽어오고, 이를 분석해 어투에 따른 색을 부여합니다. 
 
-[example screen shot]
+### 6월 3일 네이버 뉴스 헤드라인
+![6월 3일 헤드라인](https://user-images.githubusercontent.com/51745277/83594625-a6c9a180-a59a-11ea-9aad-27350ae1feb2.png)
+
+### 6월 3일 네이버 뉴스 헤드라인 - 정렬
+![6월 3일 헤드라인 정렬](https://user-images.githubusercontent.com/51745277/83594653-ba750800-a59a-11ea-8611-3aadc3b43fe9.png)
 ```sh
 Reference = https://github.com/neotune/python-korean-handler
 ```

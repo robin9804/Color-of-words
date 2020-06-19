@@ -16,10 +16,6 @@ Reference = https://github.com/neotune/python-korean-handler
 
 
 ## 개발환경설정
-- 웹 크롤링
-[requests](https://requests.readthedocs.io/en/master/) , 
-[BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-
 - 데이터 시각화
 [numpy](https://numpy.org/), 
 [matplotlib](https://matplotlib.org/)
